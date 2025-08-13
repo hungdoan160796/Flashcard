@@ -1,22 +1,15 @@
-export default function Sidebar({ active, onSelect }) {
+import React from "react";
+import NavItem from "./NavItem";
+import { Dashboard } from "../constants/dashboards";
+
+export default function Sidebar({ value, onChange }) {
   return (
     <aside className="w-56 shrink-0">
       <nav className="space-y-1">
-        {["Folders","Decks","Study","Exam"].map(label => {
-          const isActive = active === label;
-          return (
-            <button
-              key={label}
-              onClick={() => onSelect(label)}
-              className={
-                "w-full text-left px-3 py-2 rounded-lg font-medium transition " +
-                (isActive ? "bg-blue-600 text-white" : "text-slate-700 hover:bg-slate-100")
-              }
-            >
-              {label}
-            </button>
-          );
-        })}
+        <NavItem label="Folders" active={value === Dashboard.FOLDERS} onClick={() => onChange(Dashboard.FOLDERS)} />
+        <NavItem label="Decks"   active={value === Dashboard.DECKS}   onClick={() => onChange(Dashboard.DECKS)} />
+        <NavItem label="Study"   active={value === Dashboard.STUDY}   onClick={() => onChange(Dashboard.STUDY)} />
+        <NavItem label="Exam"    active={value === Dashboard.EXAM}    onClick={() => onChange(Dashboard.EXAM)} />
       </nav>
     </aside>
   );

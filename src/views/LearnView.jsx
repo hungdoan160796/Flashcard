@@ -3,7 +3,7 @@ import { isMastered, masteryProgress } from "../utils/leitner.js";
 
 const PHASE = { LEARN: "learn", QUIZ: "quiz", MASTER: "master", DONE: "done" };
 
-export default function StudyView({ deck, onLearn, onQuiz, onMaster, onStartNextGroup }) {
+export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStartNextGroup }) {
   // ---------- Build/hold a concept group (first 5 from Box 1 that still need learn) ----------
   const [groupIds, setGroupIds] = React.useState(() => {
     const box1 = deck
