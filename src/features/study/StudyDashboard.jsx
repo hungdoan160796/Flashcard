@@ -1,11 +1,10 @@
 import React from "react";
 import StudySelector from "./StudySelector";
-import ProgressSummary from "../../components/ProgressSummary";
 import StudyView from "../../views/LearnView";
 
 export default function StudyDashboard({
   repo, activeIds, setActiveIds, deck,
-  deckCount, overallPct, overallText, masteredPct, masteredText, badges,
+  deckCount,
   onLoadFromRepo, onLearn, onQuiz, onMaster,
 }) {
   return (
@@ -19,13 +18,6 @@ export default function StudyDashboard({
         onChangeActiveIds={setActiveIds}
         onLoadToStudy={onLoadFromRepo}
         currentCount={deckCount}
-      />
-      <ProgressSummary
-        overallPct={overallPct}
-        overallText={overallText}
-        masteredPct={masteredPct}
-        masteredText={masteredText}
-        earnedBadges={badges}
       />
     </>
   );

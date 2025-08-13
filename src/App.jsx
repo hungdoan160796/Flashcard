@@ -22,12 +22,12 @@ import StudyDashboard from "./features/study/StudyDashboard";
 
 export default function App() {
 
- const [dash, setDash] = React.useState(() =>
-   localStorage.getItem("dash_last_v1") || Dashboard.STUDY
- );
- React.useEffect(() => {
-   localStorage.setItem("dash_last_v1", dash);
- }, [dash]);
+  const [dash, setDash] = React.useState(() =>
+    localStorage.getItem("dash_last_v1") || Dashboard.STUDY
+  );
+  React.useEffect(() => {
+    localStorage.setItem("dash_last_v1", dash);
+  }, [dash]);
 
   // Repo (folders/decks) + CRUD
   const {
@@ -57,12 +57,17 @@ export default function App() {
         title="Flashcard"
         xp={xp}
         streak={streak}
+        overallPct={overallPctLearned}
+        overallText={overallLearnedText}
+        masteredPct={progressPctMastered}
+        masteredText={progressMasteredText}
+        badges={badges}
         onReset={() => {
           if (confirm("Reset all progress?")) resetAll();
         }}
       />
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-8xl mx-auto px-4 py-6">
         <div className="flex gap-6">
           <Sidebar value={dash} onChange={setDash} />
 
@@ -74,11 +79,6 @@ export default function App() {
                 activeIds={activeStudyDeckIds}
                 setActiveIds={setActiveStudyDeckIds}
                 deckCount={deckCount}
-                overallPct={overallPctLearned}
-                overallText={overallLearnedText}
-                masteredPct={progressPctMastered}
-                masteredText={progressMasteredText}
-                badges={badges}
                 onLoadFromRepo={() => loadRepoDecksIntoStudy(repo, activeStudyDeckIds)}
                 onLearn={onLearn}
                 onQuiz={onQuiz}

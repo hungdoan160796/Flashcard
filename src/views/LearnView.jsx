@@ -363,8 +363,8 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
   const showMasterWrongBanner = (phase === PHASE.MASTER && masterFeedback && masterFeedback.cardId === card.id);
 
   return (
-    <div className="grid grid-rows-1 gap-6">
-      {/* Left: active card with emerald fill */}
+    <div className="grid grid-rows-1 gap-2">
+      {/* Top: active card with emerald fill */}
       <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5" style={{ height: "fit-content" }}>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-emerald-50" style={{ height: `${Math.round(p * 100)}%` }} />
         <div className="relative">
@@ -406,12 +406,10 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
         </div>
       </section>
 
-      {/* Right: phase panel */}
-      <aside className="rounded-2xl border border-slate-200 bg-white p-5 h-fit">
+      {/* Bottom: phase panel */}
+      <aside className="rounded-2xl border-slate-200 p-2 h-fit">
         {phase === PHASE.LEARN && (
           <>
-            <h4 className="font-semibold mb-2">Learn</h4>
-            <p className="text-sm text-slate-600 mb-4">Mark as learned to move this card into QUIZ.</p>
             <div className="flex gap-2">
               <button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white" onClick={markLearned}>
                 Mark learned
@@ -422,8 +420,6 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
 
         {phase === PHASE.QUIZ && (
           <>
-            <h4 className="font-semibold mb-2">Quick quiz</h4>
-            <p className="text-sm text-slate-600 mb-4">We only show the concept here. Be honest with yourself 🙂</p>
             <div className="flex gap-2">
               <button className="px-4 py-2 rounded-lg border bg-white hover:bg-slate-50" onClick={() => answerQuiz(false)} disabled={quizReveal}>
                 I forgot
@@ -437,13 +433,6 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
 
         {phase === PHASE.MASTER && (
           <>
-            <h4 className="font-semibold mb-2">
-              {masterFeedback ? "Review your answer" : (multi ? "Select ALL that apply" : "Pick the correct option")}
-            </h4>
-            <p className="text-sm text-slate-600 mb-4">
-              Mix of definitions and contexts. {masterFeedback ? "Incorrect; the card will be demoted after this run." : (multi ? "This one has multiple correct answers." : "Only one is correct.")}
-            </p>
-
             {(() => {
               const showFeedback = Boolean(masterFeedback && masterFeedback.cardId === card.id);
               const displayOptions = showFeedback ? masterFeedback.options : options;
@@ -451,7 +440,7 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
 
               return (
                 <>
-                  <ul className="mb-4 grid grid-cols-2 gap-6">
+                  <ul className="mb-4 grid grid-cols-3 gap-2">
                     {displayOptions.map((opt) => {
                       const isPicked = picked.has(opt.key);
                       const isCorrect = displayCorrectKs.has(opt.key);
