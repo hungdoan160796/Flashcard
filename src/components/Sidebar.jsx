@@ -4,7 +4,7 @@ import { Dashboard } from "../constants/dashboards";
 
 export default function Sidebar({ value, onChange }) {
   return (
-    <aside className="w-56 shrink-0">
+    <aside className="w-24 shrink-0">
       <nav className="space-y-1">
         <NavItem label="Folders" active={value === Dashboard.FOLDERS} onClick={() => onChange(Dashboard.FOLDERS)} />
         <NavItem label="Decks"   active={value === Dashboard.DECKS}   onClick={() => onChange(Dashboard.DECKS)} />

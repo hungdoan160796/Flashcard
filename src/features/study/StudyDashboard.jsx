@@ -10,6 +10,9 @@ export default function StudyDashboard({
 }) {
   return (
     <>
+      <section>
+        <StudyView deck={deck} onStartNextGroup={() => {}} onLearn={onLearn} onQuiz={onQuiz} onMaster={onMaster} />
+      </section>
       <StudySelector
         repo={repo}
         activeIds={activeIds}
@@ -24,9 +27,6 @@ export default function StudyDashboard({
         masteredText={masteredText}
         earnedBadges={badges}
       />
-      <section>
-        <StudyView deck={deck} onStartNextGroup={() => {}} onLearn={onLearn} onQuiz={onQuiz} onMaster={onMaster} />
-      </section>
     </>
   );
 }

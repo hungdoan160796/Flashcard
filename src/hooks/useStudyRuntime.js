@@ -9,15 +9,13 @@ export default function useStudyRuntime() {
   const [state, setState] = React.useState(() => {
     const existing = loadState();
     if (existing) {
-      const migratedDeck = existing.deck.map(c => ({ ...c, learnedBox: c.learnedBox ?? 0 }));
+      const migratedDeck = (existing.deck || []).map(c => ({ ...c, learnedBox: c.learnedBox ?? 0 }));
       const s = { ...existing, deck: migratedDeck, ...maybeUpdateStreakFields(existing) };
-      saveState(s);
+      saveState(s);               // write back the migrated shape
       return s;
     }
-    const deck = BASE_CONCEPTS.map(c => ({
-      ...c, box: 1, nextDue: Date.now(), seen: 0, correct: 0, learnedBox: 0,
-    }));
-    const s = { deck, xp: 0, streak: 0, lastActiveDate: todayStr(), badges: [] };
+    // first-time: empty deck; will be filled when you click "Load to Study"
+    const s = { deck: [], xp: 0, streak: 0, lastActiveDate: todayStr(), badges: [] };
     saveState(s);
     return s;
   });
@@ -26,7 +24,7 @@ export default function useStudyRuntime() {
 
   React.useEffect(() => {
     const newlyEarned = BADGE_DEFS.filter(b => b.rule(state))
-                                  .filter(b => !state.badges.includes(b.id));
+      .filter(b => !state.badges.includes(b.id));
     if (newlyEarned.length) {
       setState(s => ({ ...s, badges: [...s.badges, ...newlyEarned.map(b => b.id)] }));
     }
@@ -48,44 +46,56 @@ export default function useStudyRuntime() {
   }, [state.deck]);
 
   // public handlers for StudyView
-  const onLearn = (id) => setState(s => {
-    const deck = s.deck.map(c => c.id === id
-      ? { ...c, learnedBox: Math.max(1, c.learnedBox ?? 0), box: 2, seen: c.seen + 1, nextDue: Date.now() + DAY }
-      : c
-    );
-    return { ...s, deck, xp: s.xp + 2 };
-  });
-
-  const onQuiz = (id, correct) => setState(s => {
-    const deck = s.deck.map(c => {
-      if (c.id !== id) return c;
-      return correct
-        ? { ...c, box: 3, seen: c.seen + 1, correct: c.correct + 1 }
-        : { ...c, box: 1, learnedBox: 0, seen: c.seen + 1 };
+  const onLearn = (id) => {
+    setState(s => {
+      const deck = s.deck.map(c =>
+        c.id === id
+          ? { ...c, learnedBox: Math.max(1, c.learnedBox ?? 0), box: 2, seen: c.seen + 1, nextDue: Date.now() + DAY }
+          : c
+      );
+      return { ...s, deck, xp: s.xp + 2 };
     });
-    return { ...s, deck };
-  });
+  };
 
-  const onMaster = (id, correct) => setState(s => {
-    const deck = s.deck.map(c => c.id === id
-      ? { ...c, seen: c.seen + 1, correct: c.correct + (correct ? 1 : 0), mastered: correct ? true : c.mastered || false, box: correct ? c.box : 2 }
-      : c
-    );
-    return { ...s, deck, xp: s.xp + (correct ? 8 : 2) };
-  });
 
-  function resetAll() {
-    const deck = BASE_CONCEPTS.map(c => ({
-      ...c, box: 1, nextDue: Date.now(), seen: 0, correct: 0, learnedBox: 0,
-    }));
-    setState({ deck, xp: 0, streak: 0, lastActiveDate: todayStr(), badges: [] });
-  }
+  const onQuiz = (id, correct) => {
+    setState(s => {
+      const deck = s.deck.map(c => {
+        if (c.id !== id) return c;
+        return correct
+          ? { ...c, box: 3, seen: c.seen + 1, correct: c.correct + 1 }
+          : { ...c, box: 1, learnedBox: 0, seen: c.seen + 1 }; // deferred demotion behavior
+      });
+      return { ...s, deck };
+    });
+  };
 
-  function loadRepoDecksIntoStudy(repo, activeDeckIds) {
-    const chosen = getDeckArray(repo).filter(d => activeDeckIds.includes(d.id));
-    const studyCards = toStudyCardsFromRepoDecks(chosen);
+  const onMaster = (id, correct) => {
+    setState(s => {
+      const deck = s.deck.map(c =>
+        c.id === id
+          ? {
+            ...c,
+            seen: c.seen + 1,
+            correct: c.correct + (correct ? 1 : 0),
+            mastered: correct ? true : c.mastered || false,
+            box: correct ? c.box : 2, // deferred demotion
+          }
+          : c
+      );
+      return { ...s, deck, xp: s.xp + (correct ? 8 : 2) };
+    });
+  };
+
+  const resetAll = () => {
+    const s = { deck: [], xp: 0, streak: 0, lastActiveDate: todayStr(), badges: [] };
+    setState(s); // persisted by effect
+  };
+
+  const loadRepoDecksIntoStudy = (repo, deckIds) => {
+    const studyCards = toStudyCardsFromRepoDecks(repo, deckIds); // your helper
     setState(s => ({ ...s, deck: studyCards, lastActiveDate: todayStr() }));
-  }
+  };
 
   return {
     state,

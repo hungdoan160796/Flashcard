@@ -1,18 +1,73 @@
 import React from "react";
 import { isMastered, masteryProgress } from "../utils/leitner.js";
+function deckSignature(deck) {
+  // Using ids ensures a new signature when you load a new selection
+  // (since you generate new ids when loading from repo)
+  return deck.length + ":" + deck.map(c => c.id).join(",");
+}
+
+function pickGroup(deck, { exclude = new Set(), size = 5 } = {}) {
+  // Priority buckets (excluding already in a previous group and already mastered)
+  const A = deck.filter(c =>
+    !exclude.has(c.id) && c.box === 1 && ((c.learnedBox ?? 0) < 1) && !isMastered(c)
+  );
+  const B = deck.filter(c =>
+    !exclude.has(c.id) && c.box === 2 && !isMastered(c)
+  );
+  const C = deck.filter(c =>
+    !exclude.has(c.id) && c.box === 3 && !isMastered(c)
+  );
+
+  // Stable sort (by id) for predictability
+  const byId = (a, b) => String(a.id).localeCompare(String(b.id));
+
+  const out = [];
+  for (const bucket of [A.sort(byId), B.sort(byId), C.sort(byId)]) {
+    for (const c of bucket) {
+      if (out.length >= size) break;
+      out.push(c);
+    }
+    if (out.length >= size) break;
+  }
+  return out; // can be < size if not enough unmastered cards exist
+}
+
 
 const PHASE = { LEARN: "learn", QUIZ: "quiz", MASTER: "master", DONE: "done" };
 
 export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStartNextGroup }) {
+  const deckSig = React.useMemo(() => deckSignature(deck), [deck]);
   // ---------- Build/hold a concept group (first 5 from Box 1 that still need learn) ----------
-  const [groupIds, setGroupIds] = React.useState(() => {
-    const box1 = deck
-      .filter(c => c.box === 1 && ((c.learnedBox ?? 0) < 1) && !isMastered(c))
-      .sort((a, b) => String(a.id).localeCompare(String(b.id)))
-      .slice(0, 5)
-      .map(c => c.id);
-    return new Set(box1);
+  const [groupIds, setGroupIds] = React.useState(() => {// initial pick: prefer Box1 then top-up from 2→3 (if you already have pickGroup)
+    const picked = (typeof pickGroup === "function"
+      ? pickGroup(deck, { size: 5 })
+      : deck
+        .filter(c => c.box === 1 && ((c.learnedBox ?? 0) < 1) && !isMastered(c))
+        .sort((a, b) => String(a.id).localeCompare(String(b.id)))
+        .slice(0, 5)
+    ).map(c => c.id);
+    return new Set(picked);
   });
+
+    // When the loaded study deck changes, reset group & per-run counters
+  React.useEffect(() => {
+    // rebuild the starting group for the new deck
+    const picked = (typeof pickGroup === "function"
+      ? pickGroup(deck, { size: 5 })
+      : deck
+          .filter(c => c.box === 1 && ((c.learnedBox ?? 0) < 1) && !isMastered(c))
+          .sort((a, b) => String(a.id).localeCompare(String(b.id)))
+          .slice(0, 5)
+    ).map(c => c.id);
+    setGroupIds(new Set(picked));
+
+    // reset all per-run helpers and stable counters
+    startTotalsRef.current = { learn: 0, quiz: 0, master: 0 };
+    setQuizRunIds([]); setQuizProcessed(new Set()); setQuizForgotIds(new Set()); setQuizReveal(false);
+    setMasterRunIds([]); setMasterProcessed(new Set()); setMasterPendingDemote(new Set()); setMasterFeedback(null);
+    setI(0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deckSig]); // ← fires when you load a different selection
   const group = React.useMemo(() => deck.filter(c => groupIds.has(c.id)), [deck, groupIds]);
 
   // ---------- Phase queues (live) ----------
@@ -116,7 +171,7 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
       startTotalsRef.current.learn = learnQ.length || startTotalsRef.current.learn;
     if (phase === PHASE.DONE)
       startTotalsRef.current = { learn: 0, quiz: 0, master: 0 };
-  }, [phase, learnQ.length]);
+  }, [phase, learnQ.length, deckSig]);
 
   // per-phase totals & “Card X of Y”
   const startTotal =
@@ -246,12 +301,23 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
 
   // ---------- Empty / done states ----------
   if (group.length === 0) {
+    const anyUnmastered = deck.some(c => !isMastered(c));
+    if (anyUnmastered) {
+      // There are unmastered cards but not enough to form 5 under the strict rules → pick whatever is left
+      const picked = pickGroup(deck, { size: 5 }).map(c => c.id);
+      if (picked.length > 0) {
+        setGroupIds(new Set(picked));
+        return null; // let render continue next tick with the new group
+      }
+    }
+    // Truly nothing left to learn
     return (
       <div className="rounded-2xl border border-slate-200 p-5 text-slate-500">
-        No Box-1 cards available to form a group. Add more concepts or reset progress.
+        All cards are mastered. 🎉
       </div>
     );
   }
+
 
   if (phase === PHASE.DONE) {
     return (
@@ -264,13 +330,18 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
           className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
           onClick={() => {
             onStartNextGroup?.();
-            const next = deck
-              .filter(c => c.box === 1 && ((c.learnedBox ?? 0) < 1) && !isMastered(c))
-              .filter(c => !groupIds.has(c.id))
-              .sort((a, b) => String(a.id).localeCompare(String(b.id)))
-              .slice(0, 5)
-              .map(c => c.id);
-            setGroupIds(new Set(next));
+            const next = pickGroup(
+              deck.filter(c => !groupIds.has(c.id)), // avoid immediately repeating the same cards
+              { size: 5 }
+            ).map(c => c.id);
+
+            // If there are still some unmastered cards but fewer than 5, we accept the smaller group.
+            if (next.length > 0) {
+              setGroupIds(new Set(next));
+            } else {
+              // Nothing left except mastered → surface the “All mastered” UI on next render
+              setGroupIds(new Set());
+            }
           }}
         >
           Start next group
@@ -292,7 +363,7 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
   const showMasterWrongBanner = (phase === PHASE.MASTER && masterFeedback && masterFeedback.cardId === card.id);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-rows-1 gap-6">
       {/* Left: active card with emerald fill */}
       <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5" style={{ height: "fit-content" }}>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-emerald-50" style={{ height: `${Math.round(p * 100)}%` }} />
@@ -336,7 +407,7 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
       </section>
 
       {/* Right: phase panel */}
-      <aside className="rounded-2xl border border-slate-200 bg-white p-5">
+      <aside className="rounded-2xl border border-slate-200 bg-white p-5 h-fit">
         {phase === PHASE.LEARN && (
           <>
             <h4 className="font-semibold mb-2">Learn</h4>
@@ -380,11 +451,11 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
 
               return (
                 <>
-                  <ul className="space-y-2 mb-4">
+                  <ul className="mb-4 grid grid-cols-2 gap-6">
                     {displayOptions.map((opt) => {
                       const isPicked = picked.has(opt.key);
                       const isCorrect = displayCorrectKs.has(opt.key);
-                      const base = "w-full text-left rounded-lg border px-3 py-2 transition";
+                      const base = "w-full h-full text-left rounded-lg border px-3 py-2 transition";
                       const cls =
                         showFeedback && isPicked && !isCorrect
                           ? `${base} bg-red-50 border-red-300 text-red-800`

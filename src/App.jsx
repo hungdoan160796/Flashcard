@@ -19,20 +19,15 @@ import useStudyRuntime from "./hooks/useStudyRuntime";
 // Study dashboard
 import StudyDashboard from "./features/study/StudyDashboard";
 
-function ensureUnfiledFolder(mutRepo) {
-  const existing = Object.values(mutRepo.folders || {}).find(
-    f => (f.name || "").toLowerCase() === "unfiled"
-  );
-  if (existing) return existing.id;
-  const id = "unfiled";
-  mutRepo.folders = mutRepo.folders || {};
-  mutRepo.folders[id] = { id, name: "Unfiled" };
-  return id;
-}
-
 
 export default function App() {
-  const [dash, setDash] = React.useState(Dashboard.STUDY);
+
+ const [dash, setDash] = React.useState(() =>
+   localStorage.getItem("dash_last_v1") || Dashboard.STUDY
+ );
+ React.useEffect(() => {
+   localStorage.setItem("dash_last_v1", dash);
+ }, [dash]);
 
   // Repo (folders/decks) + CRUD
   const {
