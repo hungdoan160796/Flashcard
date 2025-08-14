@@ -35,7 +35,7 @@ export default function Header({
             : "max-w-8xl mx-auto px-4 py-3 flex items-center justify-between"
         }
       >
-        <h1 className={isSidebar ? "text-lg font-bold" : "text-xl sm:text-2xl font-bold pl-4"}>
+        <h1 className={isSidebar ? "text-lg font-bold" : "text-xl sm:text-2xl font-bold"}>
           {title}
         </h1>
 
