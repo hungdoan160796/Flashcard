@@ -1,6 +1,6 @@
 import React from "react";
 import StudySelector from "./StudySelector";
-import StudyView from "../../views/LearnView";
+import StudyView from "../views/LearnView";
 
 export default function StudyDashboard({
   repo, activeIds, setActiveIds, deck,

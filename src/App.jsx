@@ -17,7 +17,7 @@ import useActiveStudyDecks from "./hooks/useActiveStudyDecks";
 import useStudyRuntime from "./hooks/useStudyRuntime";
 
 // Study dashboard
-import StudyDashboard from "./features/study/StudyDashboard";
+import StudyDashboard from "./components/StudyDashboard.jsx";
 
 
 export default function App() {

@@ -1,5 +1,5 @@
 import React from "react";
-import { getDeckArray } from "./utils";
+import { getDeckArray } from "../utils/utils";
 
 export default function StudySelector({ repo, activeIds, onChangeActiveIds, onLoadToStudy, currentCount }) {
   const decks = getDeckArray(repo);

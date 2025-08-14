@@ -3,7 +3,7 @@ import BASE_CONCEPTS from "../data/concepts";
 import { BADGE_DEFS, masteredCount } from "../data/badges";
 import { loadState, saveState, todayStr } from "../utils/storage";
 import { maybeUpdateStreakFields, DAY } from "../utils/leitner";
-import { getDeckArray, toStudyCardsFromRepoDecks } from "../features/study/utils";
+import { getDeckArray, toStudyCardsFromRepoDecks } from "../utils/utils";
 
 export default function useStudyRuntime() {
   const [state, setState] = React.useState(() => {
