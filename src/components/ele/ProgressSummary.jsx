@@ -1,6 +1,6 @@
 import React from "react";
 import ProgressBar from "./ProgressBar";
-import BadgesRow from "./BadgesRow";
+import BadgesRow from "../BadgesRow";
 
 export default function ProgressSummary({ overallPct, overallText, masteredPct, masteredText, earnedBadges }) {
   return (

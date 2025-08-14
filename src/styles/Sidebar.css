@@ -1,0 +1,58 @@
+/* Root drawer */
+.sb-drawer{
+  position: fixed;
+  z-index: 40;
+  left: 0; top: 0; bottom: 0;
+  width: 40%;               /* was w-24; widened for usability */
+  background: #fff;
+  border-right: 1px solid #e2e8f0; /* slate-200 */
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  transform: translateX(-100%);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  will-change: transform;
+  touch-action: pan-y; /* allow vertical scroll inside */
+}
+.sb-drawer.is-open{ transform: translateX(0); }
+
+/* Nav content */
+.sb-nav{
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  padding: .75rem;
+}
+
+/* Invisible edge hover/touch zone (opens on desktop hover + mobile touch) */
+.sb-edge{
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 12px;         /* hover area; narrow to avoid accidental opens */
+  z-index: 45;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: none;  /* capture horizontal intent */
+}
+
+/* Open drawer when hovering edge on pointer devices */
+@media (hover:hover) and (pointer:fine){
+  .sb-edge:hover + .sb-drawer { transform: translateX(0); }
+}
+
+/* Backdrop for mobile */
+.sb-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.4); /* slate-900/40 */
+  z-index: 35;
+  backdrop-filter: saturate(120%) blur(2px);
+}
+
+/* Desktop behavior: keep it overlay by default; you can pin it on very large screens */
+@media (min-width: 1280px){
+  /* optional: keep it closed by default but easier to hover-open */
+  .sb-edge{ width: 16px; }
+}
+
+/* Safe areas on iOS if you have footer bars in the app */
+.sb-drawer{ padding-bottom: env(safe-area-inset-bottom); }
+
