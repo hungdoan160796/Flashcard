@@ -3,7 +3,8 @@
   position: fixed;
   z-index: 40;
   left: 0; top: 0; bottom: 0;
-  width: 40%;               /* was w-24; widened for usability */
+  max-width: 16rem;
+  width: 50%;               /* was w-24; widened for usability */
   background: #fff;
   border-right: 1px solid #e2e8f0; /* slate-200 */
   box-shadow: 0 8px 24px rgba(0,0,0,.08);

@@ -25,17 +25,27 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
   }, [deckSig]);
 
   const group = React.useMemo(() => deck.filter((c) => groupIds.has(c.id)), [deck, groupIds]);
+  // when current group is empty, auto-pick a new group in an effect (not during render)
+  React.useEffect(() => {
+    if (group.length === 0) {
+      const anyUnmastered = deck.some((c) => !isMastered(c));
+      if (anyUnmastered) {
+        const pickedIds = pickGroup(deck, { size: 5 }).map((c) => c.id);
+        if (pickedIds.length > 0) setGroupIds(new Set(pickedIds));
+      }
+    }
+  }, [group.length, deckSig]); // deckSig already changes when deck changes
 
   // -------- live queues ----------
   const learnQ = React.useMemo(() => group.filter((c) => c.box === 1 && ((c.learnedBox ?? 0) < 1)), [group]);
-  const quizQ  = React.useMemo(() => group.filter((c) => c.box === 2), [group]);
-  const masterQ= React.useMemo(() => group.filter((c) => c.box === 3 && !c.mastered), [group]);
+  const quizQ = React.useMemo(() => group.filter((c) => c.box === 2), [group]);
+  const masterQ = React.useMemo(() => group.filter((c) => c.box === 3 && !c.mastered), [group]);
 
   const phase =
     learnQ.length ? PHASE.LEARN :
-    quizQ.length  ? PHASE.QUIZ  :
-    masterQ.length? PHASE.MASTER:
-    (group.length ? PHASE.DONE : PHASE.LEARN);
+      quizQ.length ? PHASE.QUIZ :
+        masterQ.length ? PHASE.MASTER :
+          (group.length ? PHASE.DONE : PHASE.LEARN);
 
   // -------- quiz run (snapshot) ----------
   const [quizRunIds, setQuizRunIds] = React.useState([]);
@@ -109,13 +119,13 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
 
   const startTotal =
     phase === PHASE.LEARN ? (startTotalsRef.current.learn || learnQ.length) :
-    phase === PHASE.QUIZ  ? (startTotalsRef.current.quiz  || quizRunIds.length || quizQ.length) :
-    phase === PHASE.MASTER? (startTotalsRef.current.master|| masterRunIds.length || masterQ.length) : 0;
+      phase === PHASE.QUIZ ? (startTotalsRef.current.quiz || quizRunIds.length || quizQ.length) :
+        phase === PHASE.MASTER ? (startTotalsRef.current.master || masterRunIds.length || masterQ.length) : 0;
 
   const processedCount =
     phase === PHASE.QUIZ ? quizProcessed.size :
-    phase === PHASE.MASTER ? masterProcessed.size :
-    Math.max(0, startTotal - queue.length);
+      phase === PHASE.MASTER ? masterProcessed.size :
+        Math.max(0, startTotal - queue.length);
 
   const currentPos = Math.min(startTotal, processedCount + 1);
 
@@ -197,11 +207,12 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
   if (group.length === 0) {
     const anyUnmastered = deck.some((c) => !isMastered(c));
     if (anyUnmastered) {
-      const pickedIds = pickGroup(deck, { size: 5 }).map((c) => c.id);
-      if (pickedIds.length > 0) { setGroupIds(new Set(pickedIds)); return null; }
+      // effect above will populate a new group on the next tick
+      return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500">Loading next group…</div>;
     }
     return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500">All cards are mastered. 🎉</div>;
   }
+
 
   if (phase === PHASE.DONE) {
     return (
@@ -241,8 +252,9 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
         <TopCard
           phaseLabel={phase.toUpperCase()}
           title={card.title}
-          definition={phase !== PHASE.QUIZ ? card.definition : quizReveal ? card.definition : undefined}
-          context={phase !== PHASE.QUIZ ? card.context : quizReveal ? card.context : undefined}
+          definition={phase === PHASE.LEARN ? card.definition : (phase === PHASE.QUIZ && quizReveal) ? card.definition : undefined}
+          context={phase === PHASE.LEARN ? card.context : (phase === PHASE.QUIZ && quizReveal) ? card.context : undefined}
+
           showQuizReveal={phase === PHASE.QUIZ && quizReveal}
           showQuizForgotBanner={showQuizForgotBanner}
           showMasterWrongBanner={showMasterWrongBanner}

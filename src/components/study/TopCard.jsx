@@ -5,13 +5,18 @@ export default function TopCard({
   title,
   definition,
   context,
-  showQuizReveal,          // kept for compatibility (ignored now)
+  showQuizReveal,          // ← used again
   showQuizForgotBanner,
   showMasterWrongBanner,
   progressPct,
-  meta, // "Box X • Seen Y • Correct Z • P%"
+  meta,
 }) {
-  const isLearn = String(phaseLabel || "").toLowerCase() === "learn";
+  const phase = String(phaseLabel || "").toLowerCase();
+  const isLearn = phase === "learn";
+  const isQuiz  = phase === "quiz";
+
+  // Show details in LEARN, or in QUIZ after the user has revealed
+  const shouldShowDetails = isLearn || (isQuiz && !!showQuizReveal);
 
   return (
     <section className="md:col-span-3 relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 h-fit">
@@ -40,8 +45,7 @@ export default function TopCard({
         <div className="text-xs text-slate-500 mb-2">Phase: {phaseLabel}</div>
         <h3 className="font-semibold text-lg sm:text-xl md:text-2xl">{title}</h3>
 
-        {/* Only show Definition/Context in LEARN phase */}
-        {isLearn && (
+        {shouldShowDetails && (
           <>
             {definition && (
               <p className="mt-3 text-sm sm:text-base leading-relaxed max-w-prose">

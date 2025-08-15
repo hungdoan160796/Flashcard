@@ -2,9 +2,13 @@ import React from "react";
 import NavItem from "./ele/NavItem";
 import Header from "./Header";
 import { Dashboard } from "../constants/dashboards";
+import StudySelector from "./StudySelector";
 import "../styles/Sidebar.css";
 
-export default function Sidebar({ value, onChange, headerProps = {} }) {
+export default function Sidebar({ value, onChange, repo, activeIds, setActiveIds, onLoadFromRepo, deckCount, headerProps = {} }) {
+  // derive arrays once so StudySelector can render a folder→decks tree
+  const foldersArr = React.useMemo(() => Object.values(repo?.folders || {}), [repo]);
+  const decksArr   = React.useMemo(() => Object.values(repo?.decks   || {}), [repo]);
   const [open, setOpen] = React.useState(false);
   const edgeRef = React.useRef(null);
   const touchRef = React.useRef({ startX: 0, startY: 0, tracking: false });
@@ -41,7 +45,7 @@ export default function Sidebar({ value, onChange, headerProps = {} }) {
     <>
       <div
         ref={edgeRef}
-        className="sb-edge"
+        className="sb-edge md:hidden"
         onMouseEnter={onMouseEnterEdge}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
@@ -68,6 +72,14 @@ export default function Sidebar({ value, onChange, headerProps = {} }) {
           <NavItem label="Study"   active={value === Dashboard.STUDY}   onClick={() => { onChange(Dashboard.STUDY);   setOpen(false); }} />
           <NavItem label="Exam"    active={value === Dashboard.EXAM}    onClick={() => { onChange(Dashboard.EXAM);    setOpen(false); }} />
         </nav>
+        <StudySelector
+          folders={foldersArr}
+          decks={decksArr}
+          activeIds={activeIds}
+          onChangeActiveIds={setActiveIds}
+          onLoadToStudy={onLoadFromRepo}
+          currentCount={deckCount}
+        />
       </aside>
     </>
   );

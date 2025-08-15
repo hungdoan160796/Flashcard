@@ -46,7 +46,10 @@ export default function App() {
 
   // Which repo deck IDs are active for Study
   const [activeStudyDeckIds, setActiveStudyDeckIds] = useActiveStudyDecks();
-
+  const safeActiveIds = React.useMemo(
+    () => Array.from(activeStudyDeckIds ?? []),
+    [activeStudyDeckIds]
+  );
   // Deck editor modal state (under Decks)
   const [deckEditor, setDeckEditor] = React.useState(null);
   // { mode: "create" } | { mode: "edit", id }
@@ -62,6 +65,18 @@ export default function App() {
         masteredPct={progressPctMastered}
         masteredText={progressMasteredText}
         badges={badges}
+        value={dash}
+        onChange={setDash}
+        repo={repo}
+        activeIds={safeActiveIds}
+        setActiveIds={setActiveStudyDeckIds}
+        deckCount={deckCount}
+        onLoadFromRepo={(ids) => {
+          const base = ids ?? activeStudyDeckIds;
+          const typed = Array.from(base ?? []).map(String);
+          console.log("[App] onLoadFromRepo ids:", typed);
+          loadRepoDecksIntoStudy(repo, typed);
+        }}
         onReset={() => {
           if (confirm("Reset all progress?")) resetAll();
         }}
@@ -69,17 +84,25 @@ export default function App() {
 
       <div className="max-w-8xl mx-auto px-4 py-6">
         <div className="flex gap-6">
-          <Sidebar value={dash} onChange={setDash} />
+          <Sidebar
+            value={dash}
+            onChange={setDash}
+            repo={repo}
+            activeIds={safeActiveIds}
+            setActiveIds={setActiveStudyDeckIds}
+            deckCount={deckCount}
+            onLoadFromRepo={(ids) => {
+              const base = ids ?? activeStudyDeckIds;
+              const typed = Array.from(base ?? []).map(String);
+              console.log("[App] onLoadFromRepo ids:", typed);
+              loadRepoDecksIntoStudy(repo, typed);
+            }}
+          />
 
           <main className="flex-1">
             {dash === Dashboard.STUDY && (
               <StudyDashboard
                 deck={deck}
-                repo={repo}
-                activeIds={activeStudyDeckIds}
-                setActiveIds={setActiveStudyDeckIds}
-                deckCount={deckCount}
-                onLoadFromRepo={() => loadRepoDecksIntoStudy(repo, activeStudyDeckIds)}
                 onLearn={onLearn}
                 onQuiz={onQuiz}
                 onMaster={onMaster}
@@ -141,10 +164,6 @@ Decks: ${deckIds.join(", ") || "(none)"}`);
                 />
               </section>
             )}
-
-            <footer className="mt-10 text-xs text-slate-500">
-              <p>Tip: Progress saves to this browser.</p>
-            </footer>
           </main>
         </div>
       </div>

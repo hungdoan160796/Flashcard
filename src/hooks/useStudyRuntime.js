@@ -93,7 +93,11 @@ export default function useStudyRuntime() {
   };
 
   const loadRepoDecksIntoStudy = (repo, deckIds) => {
-    const studyCards = toStudyCardsFromRepoDecks(repo, deckIds); // your helper
+    const idSet = new Set((deckIds ?? []).map(String));
+    const selectedDecks = Object.values(repo.decks || {}).filter(
+      (d) => idSet.has(String(d.id))
+    );
+    const studyCards = toStudyCardsFromRepoDecks(selectedDecks);
     setState(s => ({ ...s, deck: studyCards, lastActiveDate: todayStr() }));
   };
 
