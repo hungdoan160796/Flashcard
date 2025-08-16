@@ -256,7 +256,7 @@ export default function MultiSelectTree({
             className="
               relative w-full max-w-full bg-white rounded-t-2xl top-0 md:rounded-2xl
               shadow-2xl border border-slate-200 flex flex-col
-              max-h-[90dvh] md:max-h-[80vh] md:w-[720px] overflow-hidden
+              max-h-[90dvh] md:max-h-[80vh] md:w-[600px] overflow-hidden
             "
           >
             {/* header */}
