@@ -83,7 +83,7 @@ export default function App() {
       />
 
       <div className="max-w-8xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
+        <div className="flex gap-6 w-full">
           <Sidebar
             value={dash}
             onChange={setDash}
@@ -99,7 +99,7 @@ export default function App() {
             }}
           />
 
-          <main className="flex-1">
+          <main className="flex-1 w-full">
             {dash === Dashboard.STUDY && (
               <StudyDashboard
                 deck={deck}
@@ -110,7 +110,7 @@ export default function App() {
             )}
 
             {dash === Dashboard.FOLDERS && (
-              <section className="rounded-xl border border-slate-200 bg-white p-6 w-80 mx-auto">
+              <section className="rounded-xl border border-slate-200 bg-white p-6 w-full mx-auto">
                 <FolderView
                   folders={foldersArr}
                   decks={decksArr}
@@ -123,7 +123,7 @@ export default function App() {
             )}
 
             {dash === Dashboard.DECKS && (
-              <section className="rounded-xl border border-slate-200 bg-white p-6 w-80 mx-auto">
+              <section className="rounded-xl border border-slate-200 bg-white p-6 w-full mx-auto">
                 {deckEditor ? (
                   <AddDeckView
                     mode={deckEditor.mode}
@@ -152,7 +152,7 @@ export default function App() {
             )}
 
             {dash === Dashboard.EXAM && (
-              <section className="rounded-xl border border-slate-200 bg-white p-6 w-80 mx-auto">
+              <section className="rounded-xl border border-slate-200 bg-white p-6 w-full mx-auto">
                 <ExamsView
                   folders={repo.folders}
                   decks={repo.decks}
