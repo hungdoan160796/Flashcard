@@ -232,7 +232,7 @@ export default function MultiSelectTree({
       <button
         type="button"
         ref={launcherRef}
-        className="w-36 flex justify-between items-center gap-2 border rounded px-3 py-2 text-left"
+        className="w-full flex justify-between items-center gap-2 border rounded px-3 py-2 text-left"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
