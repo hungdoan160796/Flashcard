@@ -110,7 +110,7 @@ export default function App() {
             )}
 
             {dash === Dashboard.FOLDERS && (
-              <section className="rounded-xl border border-slate-200 bg-white p-6">
+              <section className="rounded-xl border border-slate-200 bg-white p-6 w-80 mx-auto">
                 <FolderView
                   folders={foldersArr}
                   decks={decksArr}
@@ -123,7 +123,7 @@ export default function App() {
             )}
 
             {dash === Dashboard.DECKS && (
-              <section className="rounded-xl border border-slate-200 bg-white p-6">
+              <section className="rounded-xl border border-slate-200 bg-white p-6 w-80 mx-auto">
                 {deckEditor ? (
                   <AddDeckView
                     mode={deckEditor.mode}
@@ -152,7 +152,7 @@ export default function App() {
             )}
 
             {dash === Dashboard.EXAM && (
-              <section className="rounded-xl border border-slate-200 bg-white p-6">
+              <section className="rounded-xl border border-slate-200 bg-white p-6 w-80 mx-auto">
                 <ExamsView
                   folders={repo.folders}
                   decks={repo.decks}
