@@ -27,7 +27,7 @@
 .sb-edge{
   position: fixed;
   left: 0; top: 0; bottom: 0;
-  width: 12px;         /* hover area; narrow to avoid accidental opens */
+  width: 16px;         /* hover area; narrow to avoid accidental opens */
   z-index: 45;
   background: transparent;
   cursor: ew-resize;
