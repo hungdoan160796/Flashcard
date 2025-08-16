@@ -164,6 +164,7 @@ Decks: ${deckIds.join(", ") || "(none)"}`);
                 />
               </section>
             )}
+            <div id="modal-root" />
           </main>
         </div>
       </div>

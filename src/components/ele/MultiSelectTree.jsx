@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 
 /* ---------------- hooks ---------------- */
 function useModal(open, onClose) {
@@ -81,8 +82,6 @@ export default function MultiSelectTree({
     // return focus to launcher on next frame (after unmount animation)
     requestAnimationFrame(() => launcherRef.current?.focus?.({ preventScroll: true }));
   }, []);
-
-  useModal(open, closeAndReturnFocus);
 
   // Close when clicking anywhere outside the dialog (or the launcher)
   React.useEffect(() => {
@@ -243,37 +242,43 @@ export default function MultiSelectTree({
         </span>
       </button>
 
-      {/* Modal */}
-      {open && (
-        <div className="fixed inset-0 z-50">
+            {/* Modal (ported to #modal-root in App.jsx) */}
+      {open && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center md:items-center justify-center p-3">
+          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/30" onClick={closeAndReturnFocus} />
+          {/* Panel */}
           <div
             ref={panelRef}
-            role="dialog" aria-modal="true" aria-label="Select decks"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Select decks"
             className="
-  absolute inset-x-0 bottom-0 w-full max-w-full
-  bg-white rounded-t-2xl shadow-lg flex flex-col max-h-[90dvh]
-
-  md:fixed md:inset-auto md:top-40 md:left-1/2 md:-translate-x-1/2
-  md:w-[720px] md:rounded-2xl md:max-h-[80vh] md:z-50 md:transform md:shadow-2xl md:border md:border-slate-200 md:w-1/3"
+              relative w-full max-w-full bg-white rounded-t-2xl top-0 md:rounded-2xl
+              shadow-2xl border border-slate-200 flex flex-col
+              max-h-[90dvh] md:max-h-[80vh] md:w-[720px] overflow-hidden
+            "
           >
+            {/* header */}
             <div className="flex items-center justify-between gap-2 p-3 border-b">
               <div className="font-medium">Select decks</div>
             </div>
 
+            {/* body */}
             <div className="overflow-auto p-3 space-y-3">
               {folderList.length === 0 ? (
                 <div className="text-sm text-slate-500">No folders or decks yet.</div>
               ) : (
-                folderList.map(f => <FolderRow key={f.id || "unfiled"} folder={f} />)
+                folderList.map(f => <FolderRow key={f.id || 'unfiled'} folder={f} />)
               )}
             </div>
 
+            {/* footer */}
             <div className="flex flex-col p-3 border-t gap-2">
               <button
                 type="button"
                 className="px-3 py-2 rounded border"
-                onClick={() => { dispatch({ type: "reset", ids: selectedIds }); closeAndReturnFocus(); }}
+                onClick={() => { dispatch({ type: 'reset', ids: selectedIds }); closeAndReturnFocus(); }}
               >
                 Cancel
               </button>
@@ -286,7 +291,8 @@ export default function MultiSelectTree({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.getElementById('modal-root') || document.body
       )}
     </div>
   );
