@@ -67,21 +67,21 @@ export default function Header({
     <Wrapper
       className={
         isSidebar
-          ? "border-b border-slate-200 p-3"
+          ? "border-b border-slate-200"
           : "sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200"
       }
     >
       <div
         className={
           isSidebar
-            ? "px-3 py-3 flex flex-col"
+            ? "px-4 py-2 flex flex-col"
             : "max-w-8xl mx-auto px-4 py-2"
         }
       >
         {/* Top row */}
         <div className={isSidebar ? "flex flex-col gap-3" : "flex items-center"}>
           {/* Left: Title */}
-          <h1 className={isSidebar ? "text-lg font-bold" : "text-xl sm:text-2xl font-bold sm:pr-12"}>
+          <h1 className={isSidebar ? "text-2xl font-bold" : "text-2xl font-bold sm:pr-12"}>
             {title}
           </h1>
 

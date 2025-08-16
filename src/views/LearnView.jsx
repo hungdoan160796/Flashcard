@@ -203,14 +203,15 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, masterRunIds, masterProcessed, masterPendingDemote]);
 
+  if (deck.length === 0 || !card) return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500 flex justify-center align-center">Swipe left to add/select decks.</div>;
   // -------- empty/done states ----------
   if (group.length === 0) {
     const anyUnmastered = deck.some((c) => !isMastered(c));
     if (anyUnmastered) {
       // effect above will populate a new group on the next tick
-      return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500">Loading next group…</div>;
+      return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500 flex justify-center align-center">Loading next group…</div>;
     }
-    return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500">All cards are mastered. 🎉</div>;
+    return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500 flex justify-center align-center">All cards are mastered. 🎉</div>;
   }
 
 
@@ -241,7 +242,7 @@ export default function StudyView({ deck = [], onLearn, onQuiz, onMaster, onStar
   const showMasterWrongBanner = phase === PHASE.MASTER && masterFeedback && masterFeedback.cardId === card.id;
 
   const footer = (
-    <div className="text-xs sm:text-sm text-slate-500 mt-4">
+    <div className="text-xs sm:text-sm text-slate-500 mt-4 w-full text-center">
       Card {Math.max(1, currentPos)} of {startTotal}
     </div>
   );

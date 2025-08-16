@@ -33,10 +33,10 @@ export default function StudySelector({
   );
 
   return (
-    <div className="my-4 p-4 h-fit md:my-0 md:p-0 md:h-auto">
+    <div className="p-4 h-fit md:my-0 md:p-0 md:h-auto">
       <div className="flex flex-col gap-3">
         <label className="block flex-1">
-          <div className="text-sm font-medium mb-1 p-2 md:hidden">Choose decks</div>
+          <div className="text-sm font-medium mb-1 md:hidden">Decks</div>
           <MultiSelectTree
             folders={folders}
             decks={decks}
