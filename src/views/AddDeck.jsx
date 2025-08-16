@@ -33,7 +33,7 @@ export default function AddDeckView({ mode = "create", folders = [], initial, on
 
         const fields = res.meta?.fields || [];
         if (!fields.includes("term") || !fields.includes("definition")) {
-          setError("CSV must include headers: term, definition. (Optional: use)");
+          setError("CSV must include headers: term, definition, and use)");
           return;
         }
 
@@ -154,13 +154,13 @@ export default function AddDeckView({ mode = "create", folders = [], initial, on
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col items-start gap-3">
           <label className="text-sm font-medium">CSV import</label>
           <input ref={fileRef} type="file" accept=".csv" onChange={handleFileChange} />
           {isParsing && <span className="text-xs text-slate-500">Parsing…</span>}
         </div>
         <p className="text-xs text-slate-600">
-          Required headers: <code>term, definition</code>. Optional: <code>use</code>.
+          Required headers: <code>term, definition, and use</code>.
         </p>
       </div>
 
@@ -179,7 +179,7 @@ export default function AddDeckView({ mode = "create", folders = [], initial, on
                 <th className="text-left p-2 border-b w-12">#</th>
                 <th className="text-left p-2 border-b">Term</th>
                 <th className="text-left p-2 border-b">Definition</th>
-                <th className="text-left p-2 border-b">Use (optional)</th>
+                <th className="text-left p-2 border-b">Use</th>
                 <th className="text-left p-2 border-b w-16"></th>
               </tr>
             </thead>
