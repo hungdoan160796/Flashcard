@@ -4,7 +4,7 @@ import BadgesRow from "../BadgesRow";
 
 export default function ProgressSummary({ overallPct, overallText, masteredPct, masteredText, earnedBadges }) {
   return (
-    <div className="w-full px-4">
+    <div className="w-full pl-4 sm:px-4">
       <ProgressBar pct={overallPct}  label={overallText} />
     </div>
   );
