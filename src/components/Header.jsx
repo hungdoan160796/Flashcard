@@ -81,7 +81,7 @@ export default function Header({
         {/* Top row */}
         <div className={isSidebar ? "flex flex-col gap-3" : "flex items-center"}>
           {/* Left: Title */}
-          <h1 className={isSidebar ? "text-lg font-bold" : "text-xl sm:text-2xl font-bold pr-12"}>
+          <h1 className={isSidebar ? "text-lg font-bold" : "text-xl sm:text-2xl font-bold sm:pr-12"}>
             {title}
           </h1>
 
