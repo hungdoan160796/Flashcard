@@ -2,7 +2,7 @@ import React from "react";
 import useSwipe from "../../hooks/swipeDetector";
 
 // ---- Context so any nested component can read the swipe value ----
-const SwipeContext = React.createContext({ swipe: null });
+const SwipeContext = React.createContext({ swipe: null, setSwipe: () => {} });
 export const useSwipeValue = () => React.useContext(SwipeContext);
 
 /**
@@ -41,8 +41,8 @@ export default function SwipeSnackDemo({ children }) {
     typeof children === "function" ? children({ swipe }) : children;
 
   return (
-    <SwipeContext.Provider value={{ swipe }}>
-      <main
+    <SwipeContext.Provider value={{ swipe, setSwipe }}>
+      <div
         ref={ref}
         {...handlers}
         className="min-h-screen"
@@ -54,18 +54,7 @@ export default function SwipeSnackDemo({ children }) {
             <p className="mt-2 text-sm">Latest swipe: {swipe ?? "—"}</p>
           </div>
         )}
-
-        {/* Snackbar */}
-        <div
-          role="status"
-          aria-live="polite"
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl shadow-lg
-                      bg-neutral-900 text-white text-sm transition-all
-                      ${notice ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"}`}
-        >
-          {notice || ""}
-        </div>
-      </main>
+      </div>
     </SwipeContext.Provider>
   );
 }
