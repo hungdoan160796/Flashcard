@@ -34,10 +34,6 @@ export default function Header({
   // Build arrays for StudySelector (same as Sidebar.jsx)
   const foldersArr = React.useMemo(() => Object.values(repo?.folders || {}), [repo]);
   const decksArr = React.useMemo(() => Object.values(repo?.decks || {}), [repo]);
-  const selectedIds = React.useMemo(
-    () => Array.from(activeIds ?? []),
-    [activeIds]
-  );
   // Popover state for StudySelector
   const [selOpen, setSelOpen] = React.useState(false);
   const popRef = React.useRef(null);
@@ -56,12 +52,6 @@ export default function Header({
       document.removeEventListener("keydown", onEsc);
     };
   }, [selOpen]);
-
-  // When user applies selection to study, also close the popover
-  const handleLoadToStudy = React.useCallback((ids) => {
-    onLoadFromRepo?.(ids);
-    setSelOpen(false);
-  }, [onLoadFromRepo]);
 
   return (
     <Wrapper
@@ -123,9 +113,9 @@ export default function Header({
               <StudySelector
                 folders={foldersArr}
                 decks={decksArr}
-                activeIds={selectedIds}
-                onChangeActiveIds={(next) => setActiveIds?.(Array.from(next ?? []))}
-                onLoadToStudy={handleLoadToStudy}
+                activeIds={activeIds}
+                onChangeActiveIds={setActiveIds}
+                onLoadToStudy={onLoadFromRepo}
                 currentCount={deckCount}
               />
             </div>
