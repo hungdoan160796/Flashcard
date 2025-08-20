@@ -40,7 +40,10 @@ export default function LearnView(props) {
 
   // --- Empty/done UI states ---
   if (emptyState === "noSelection") {
-    return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500 flex justify-center align-center">Swipe left to add/select decks.</div>;
+    return <>
+    <div className="hidden md:flex rounded-2xl border border-slate-200 p-5 text-slate-500 flex justify-center align-center">Click "Decks" to add deck first.</div>
+    <div className="flex md:hidden rounded-2xl border border-slate-200 p-5 text-slate-500 flex justify-center align-center">Swipe right and click "Decks" to add a new deck.</div>
+    </>;
   }
   if (emptyState === "loadingNext") {
     return <div className="rounded-2xl border border-slate-200 p-5 text-slate-500 flex justify-center align-center">Loading next group…</div>;
