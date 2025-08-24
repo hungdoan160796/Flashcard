@@ -1,0 +1,45 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  nextjs:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck --if-present
+
+      - name: Test
+        run: npm test --if-present
+
+      - name: Build
+        run: npm run build
+
+  docs_quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: 'npm' }
+      - run: npm ci
+      - name: Markdown style
+        run: npx markdownlint-cli2 "**/*.md" "#node_modules" "#.next" || true
+      - name: Spelling
+        run: npm run docs:spell || true
+      - name: Link check
+        uses: lycheeverse/lychee-action@v1
+        with: { args: --no-progress --verbose . }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

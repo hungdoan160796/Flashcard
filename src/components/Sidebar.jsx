@@ -6,7 +6,7 @@ import { Dashboard } from "../constants/dashboards";
 import StudySelector from "./StudySelector";
 import "../styles/Sidebar.css";
 
-export default function Sidebar({ title = "Flashcard", value, onChange, repo, activeIds, setActiveIds, onLoadFromRepo, deckCount, xp = 0, streak = 0, onReset, swipe }) {
+export default function Sidebar({ title = "Flashcard", value, onChange, repo, activeIds, setActiveIds, onLoadFromRepo, deckCount, xp = 0, streak = 0, onReset, swipe, setSwipe }) {
 
   // derive arrays once so StudySelector can render a folder→decks tree
   const foldersArr = React.useMemo(() => Object.values(repo?.folders || {}), [repo]);
@@ -36,10 +36,10 @@ export default function Sidebar({ title = "Flashcard", value, onChange, repo, ac
         </div>
       </div>
       <nav className="sb-nav">
-        <NavItem label="Folders" active={value === Dashboard.FOLDERS} onClick={() => { onChange(Dashboard.FOLDERS); setOpen(false); }} />
-        <NavItem label="Decks" active={value === Dashboard.DECKS} onClick={() => { onChange(Dashboard.DECKS); setOpen(false); }} />
-        <NavItem label="Study" active={value === Dashboard.STUDY} onClick={() => { onChange(Dashboard.STUDY); setOpen(false); }} />
-        <NavItem label="Exam" active={value === Dashboard.EXAM} onClick={() => { onChange(Dashboard.EXAM); setOpen(false); }} />
+        <NavItem label="Folders" active={value === Dashboard.FOLDERS} onClick={() => { onChange(Dashboard.FOLDERS); setSwipe("swipeLeft"); }} />
+        <NavItem label="Decks" active={value === Dashboard.DECKS} onClick={() => { onChange(Dashboard.DECKS); setSwipe("swipeLeft"); }} />
+        <NavItem label="Study" active={value === Dashboard.STUDY} onClick={() => { onChange(Dashboard.STUDY); setSwipe("swipeLeft"); }} />
+        <NavItem label="Exam" active={value === Dashboard.EXAM} onClick={() => { onChange(Dashboard.EXAM); setSwipe("swipeLeft"); }} />
       </nav>
       <StudySelector
         folders={foldersArr}

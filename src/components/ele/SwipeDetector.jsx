@@ -2,7 +2,7 @@ import React from "react";
 import useSwipe from "../../hooks/swipeDetector";
 
 // ---- Context so any nested component can read the swipe value ----
-const SwipeContext = React.createContext({ swipe: null, setSwipe: () => {} });
+const SwipeContext = React.createContext({ swipe: null, setSwipe: () => { } });
 export const useSwipeValue = () => React.useContext(SwipeContext);
 
 /**
@@ -13,17 +13,7 @@ export const useSwipeValue = () => React.useContext(SwipeContext);
  * - If children is a function, calls it with { swipe } (render-prop)
  */
 export default function SwipeSnackDemo({ children }) {
-  const [notice, setNotice] = React.useState(null);
   const [swipe, setSwipe] = React.useState(null); // "swipeLeft" | "swipeRight" | null
-  const timeoutRef = React.useRef(null);
-
-  const showNotice = (msg) => {
-    setNotice(msg);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setNotice(null), 1200);
-  };
-
-  React.useEffect(() => () => clearTimeout(timeoutRef.current), []);
 
   const { ref, handlers } = useSwipe({
     onLeft: () => {
@@ -38,7 +28,7 @@ export default function SwipeSnackDemo({ children }) {
   });
 
   const renderedChildren =
-    typeof children === "function" ? children({ swipe }) : children;
+    typeof children === "function" ? children({ swipe, setSwipe }) : children;
 
   return (
     <SwipeContext.Provider value={{ swipe, setSwipe }}>
@@ -48,12 +38,7 @@ export default function SwipeSnackDemo({ children }) {
         className="min-h-screen"
         style={{ touchAction: "pan-y" }} // keep vertical scroll smooth
       >
-        {renderedChildren ?? (
-          <div className="p-6 text-center opacity-80">
-            <p className="text-lg">Swipe anywhere on this area.</p>
-            <p className="mt-2 text-sm">Latest swipe: {swipe ?? "—"}</p>
-          </div>
-        )}
+        {renderedChildren}
       </div>
     </SwipeContext.Provider>
   );

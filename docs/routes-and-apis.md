@@ -1,0 +1,1 @@
+Pages, dynamic routes, API endpoints, required headers/body, sample requests

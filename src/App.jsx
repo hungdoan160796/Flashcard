@@ -45,7 +45,7 @@ export default function App() {
 
   return (
     <SwipeSnackDemo>
-      {({ swipe }) =>
+      {({ swipe, setSwipe }) =>
         <div className="min-h-screen bg-slate-50 text-slate-900">
           <Header
             title="Flashcard"
@@ -78,6 +78,7 @@ export default function App() {
                 deckCount={deckCount}
                 onLoadFromRepo={onLoadFromRepo}
                 swipe={swipe}
+                setSwipe={setSwipe}
               />
               <main className="flex-1 w-full">
                 {dash === Dashboard.STUDY && (

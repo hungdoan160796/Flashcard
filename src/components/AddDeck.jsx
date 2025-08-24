@@ -30,13 +30,6 @@ export default function AddDeckView({ mode = "create", folders = [], initial, on
       transformHeader: (h) => h.trim().toLowerCase(),
       complete: (res) => {
         setIsParsing(false);
-
-        const fields = res.meta?.fields || [];
-        if (!fields.includes("term") || !fields.includes("definition")) {
-          setError("CSV must include headers: term, definition, and use)");
-          return;
-        }
-
         const cleaned = [];
         const seen = new Set();
 
